@@ -170,6 +170,35 @@ tr.clickable-row:hover td{background:rgba(249,115,22,0.06)}
   </div>
 </div>
 
+<!-- AI CHAT WIDGET -->
+<div id="aiChatWidget" style="display:none;position:fixed;bottom:24px;right:24px;width:360px;max-height:520px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;z-index:900;flex-direction:column;box-shadow:0 8px 48px rgba(0,0,0,0.6)">
+  <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--primary),#EA580C);border-radius:16px 16px 0 0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px">🤖</div>
+      <div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:14px;color:#fff">Dispatch AI</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7)">Ask me anything about your operation</div>
+      </div>
+    </div>
+    <button onclick="toggleAI()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
+  </div>
+  <div id="aiMsgs" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;max-height:340px;min-height:180px">
+    <div style="background:var(--bg-elevated);border-radius:10px 10px 10px 2px;padding:10px 13px;font-size:13px;color:var(--text-secondary);line-height:1.55;border:1px solid var(--border)">Hey! I am your Dispatch AI. Ask me about your jobs, techs, revenue, response times — or how to improve your operation. 💪</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px">
+      <button onclick="quickAsk('How many jobs are active right now?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);border-radius:20px;padding:4px 10px;font-family:var(--font-body);font-size:11px;cursor:pointer">Active jobs?</button>
+      <button onclick="quickAsk('Which tech has the best response time?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);border-radius:20px;padding:4px 10px;font-family:var(--font-body);font-size:11px;cursor:pointer">Best tech?</button>
+      <button onclick="quickAsk('How is revenue tracking this month?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);border-radius:20px;padding:4px 10px;font-family:var(--font-body);font-size:11px;cursor:pointer">Revenue?</button>
+    </div>
+  </div>
+  <div style="padding:10px;border-top:1px solid var(--border);display:flex;gap:8px">
+    <input id="aiInput" placeholder="Ask anything..." style="flex:1;background:var(--bg-base);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')sendAI()">
+    <button onclick="sendAI()" style="background:var(--primary);border:none;color:#fff;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:var(--font-body);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;transition:all .2s">Send</button>
+  </div>
+</div>
+
+<!-- AI TOGGLE BUTTON -->
+<button id="aiToggleBtn" onclick="toggleAI()" style="display:none;position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#EA580C);border:none;color:#fff;font-size:22px;cursor:pointer;z-index:899;box-shadow:0 4px 20px var(--primary-glow);transition:transform .2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</button>
+
 <!-- LOGIN -->
 <div id="loginScreen" class="login-wrapper diamond-bg">
   <div class="login-box">
@@ -180,8 +209,12 @@ tr.clickable-row:hover td{background:rgba(249,115,22,0.06)}
         <p class="login-subtitle">Client Command Center</p>
       </div>
     </div>
+    <div style="display:flex;margin-bottom:20px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+      <button id="roleOwner" onclick="setDemoRole('owner')" style="flex:1;padding:11px;background:var(--primary);border:none;color:#fff;font-family:var(--font-body);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer">Shop Owner</button>
+      <button id="roleTech" onclick="setDemoRole('tech')" style="flex:1;padding:11px;background:var(--bg-base);border:none;color:var(--text-muted);font-family:var(--font-body);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer">Technician</button>
+    </div>
     <div class="login-field">
-      <label>Business ID</label>
+      <label id="loginIdLabel">Business ID</label>
       <input type="text" id="inputUser" placeholder="Enter your business ID" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="login-field">
@@ -190,7 +223,7 @@ tr.clickable-row:hover td{background:rgba(249,115,22,0.06)}
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Access Portal</button>
     <p class="login-error" id="loginError" style="color:var(--red);font-size:13px;margin-top:12px;text-align:center;display:none">Invalid credentials.</p>
-    <p class="demo-hint">Demo: ID <span>lonestar</span> · Password <span>diesel2026</span></p>
+    <p class="demo-hint" id="loginHint">Owner: <span>lonestar</span> / <span>diesel2026</span> &nbsp;|&nbsp; Tech: <span>carlos.m</span> / <span>tech2026</span></p>
   </div>
 </div>
 
@@ -212,7 +245,7 @@ tr.clickable-row:hover td{background:rgba(249,115,22,0.06)}
           <span class="header-client-name">Lone Star Diesel Repair</span><br>
           <span class="header-client-meta">Dallas, TX · Since March 2026</span>
         </div>
-        <span class="badge-owner">OWNER</span>
+        <span class="badge-owner" id="headerRoleBadge">OWNER</span>
         <button class="logout-btn" onclick="doLogout()">Sign Out</button>
       </div>
     </div>
@@ -358,7 +391,108 @@ tr.clickable-row:hover td{background:rgba(249,115,22,0.06)}
       </div>
     </div>
 
+    <!-- SETTINGS -->
+    <div class="tab-content" id="tab-settings">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Portal Settings</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Business Name</label>
+            <input id="s-biz" value="Lone Star Diesel Repair" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Owner Name</label>
+            <input id="s-owner" value="Mike Hernandez" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Location</label>
+            <input id="s-loc" value="Dallas, TX" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Monthly Revenue Goal ($)</label>
+            <input id="s-goal" value="60000" type="number" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none">
+          </div>
+        </div>
+        <button onclick="savePortalSettings()" style="background:linear-gradient(135deg,var(--primary),#EA580C);border:none;color:#fff;padding:10px 28px;border-radius:8px;cursor:pointer;font-family:var(--font-display);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px">Save Settings</button>
+        <span id="settingsSaved" style="display:none;margin-left:12px;font-size:13px;color:var(--green)">✓ Saved</span>
+      </div>
+
+      <!-- CALL TRANSCRIPTS -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Call Transcripts</span>
+          <span style="font-size:12px;color:var(--text-muted)">Recent AI-answered calls</span>
+        </div>
+        <div id="transcriptsList"></div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- ADD TECH MODAL -->
+  <div class="modal-overlay" id="addTechModal" onclick="if(event.target===this)closeAddTech()">
+    <div class="modal">
+      <div class="modal-top">
+        <button class="modal-close" onclick="closeAddTech()">×</button>
+        <div class="modal-job-id"><span>Add New Technician</span></div>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Full Name</label><input id="nt-name" placeholder="e.g. James Torres" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none"></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Specialty</label><input id="nt-spec" placeholder="e.g. DEF / Engine Diag" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none"></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Login ID</label><input id="nt-login" placeholder="e.g. james.t" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none"></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600">Priority</label><input id="nt-priority" type="number" placeholder="6" style="background:var(--bg-base);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none"></div>
+        </div>
+        <button onclick="addTech()" style="margin-top:20px;width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),#EA580C);border:none;border-radius:8px;color:#fff;font-family:var(--font-display);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer">Add Technician</button>
+        <p id="addTechMsg" style="display:none;text-align:center;font-size:13px;color:var(--green);margin-top:10px">✓ Technician added</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECH DASHBOARD -->
+  <div id="techDashboard" style="display:none">
+  <div class="header diamond-bg">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="header-logo">DG</div>
+        <div>
+          <div class="header-title">Diesel <span>Growth</span></div>
+          <div class="header-label">Technician Portal</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="live-clock" id="techClock"></div>
+        <div class="live-indicator"><span class="live-dot"></span>Live</div>
+        <div id="techHeaderName" style="text-align:right"></div>
+        <span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,0.3)">TECHNICIAN</span>
+        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+    <div class="nav-tabs" id="techNavTabs">
+      <button class="nav-tab active" data-techTab="mystatus">My Status</button>
+      <button class="nav-tab" data-techTab="myjobs">My Jobs</button>
+      <button class="nav-tab" data-techTab="techinsights">Insights</button>
+    </div>
+    <div class="main">
+      <div class="tab-content active" id="techTab-mystatus">
+        <div id="techHeroSection"></div>
+        <div class="panel"><div class="panel-header"><span class="panel-title">My Shift Schedule</span></div><div id="techShiftGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:4px"></div></div>
+        <div class="panel"><div class="panel-header"><span class="panel-title">Notes from Dispatch</span></div><div id="techNotesSection"></div></div>
+      </div>
+      <div class="tab-content" id="techTab-myjobs">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">My Jobs This Month</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Job ID</th><th>Date</th><th>Company</th><th>Issue</th><th>Response</th><th>Revenue</th><th>Status</th></tr></thead><tbody id="techJobsBody"></tbody></table></div>
+        </div>
+        <div class="panel"><div class="panel-header"><span class="panel-title">My Performance</span></div><div class="chart-container"><canvas id="chartTechMyPerf"></canvas></div></div>
+      </div>
+      <div class="tab-content" id="techTab-techinsights">
+        <div class="panel"><div class="panel-header"><span class="panel-title">Tips & Insights</span></div><div id="techInsightsList"></div></div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer">
     <span class="footer-text">DIESEL GROWTH · CONFIDENTIAL CLIENT PORTAL · DEMO</span>
     <span class="footer-text" id="footerSync">Live sync · 284 jobs · Demo mode</span>
@@ -389,54 +523,221 @@ const DEMO_JOBS = [
   {id:'JOB-4803',date:'Apr 16, 2026',callerName:'Steven Park',callbackNumber:'+15109345678',company:'Lone Star Diesel Repair',fleetName:'Test Fleet',truckType:'Peterbilt 579',truckNumber:'TEST-001',issue:'Scheduled maintenance',issueDetail:'30,000 mile service — oil, filters, DEF fluid, safety check',urgency:'Low',driveable:'Yes',jobLocation:'1234 Industrial Blvd, Dallas TX',onsiteContact:'Steven Park',tech:'Chris R.',response:'N/A',revenue:'$420',status:'Completed',notes:'All service items completed. Next service at 60,000 miles.'},
   {id:'JOB-4802',date:'Apr 16, 2026',callerName:'Diana Prince',callbackNumber:'+15100456789',company:'Olympus Freight',fleetName:'OF Express',truckType:'Kenworth T680',truckNumber:'OF-0334',issue:'Brake adjustment',issueDetail:'Brake pads worn, pulling to right on braking',urgency:'Medium',driveable:'Yes',jobLocation:'IH-35 S near San Antonio TX',onsiteContact:'Diana Prince',tech:'Danny R.',response:'5 min',revenue:'$560',status:'Completed',notes:''},
   {id:'JOB-4801',date:'Apr 20, 2026',callerName:'Nathan Cross',callbackNumber:'+15101567890',company:'Cross Country Carriers',fleetName:'CCC Fleet',truckType:'Mack Anthem',truckNumber:'CCC-0889',issue:'Fuel leak',issueDetail:'Diesel dripping from fuel line near injection pump',urgency:'Critical',driveable:'No',jobLocation:'I-40 W near Amarillo TX',onsiteContact:'Nathan Cross',tech:'—',response:'—',revenue:'—',status:'Pending',notes:''},
+  // More Pending
+  {id:'JOB-4822',date:'Apr 20, 2026',callerName:'Jerome Bell',callbackNumber:'+15102223344',company:'Bell Trucking LLC',fleetName:'Bell Fleet',truckType:'Peterbilt 389',truckNumber:'BT-0441',issue:'Check engine light',issueDetail:'Multiple fault codes, truck running rough at highway speed',urgency:'High',driveable:'Yes',jobLocation:'I-20 E near Midland TX',onsiteContact:'Jerome Bell',tech:'—',response:'—',revenue:'—',status:'Pending',notes:''},
+  {id:'JOB-4823',date:'Apr 20, 2026',callerName:'Sofia Mendez',callbackNumber:'+15103334455',company:'Aztec Transport',fleetName:'AT South',truckType:'Freightliner Cascadia',truckNumber:'AT-0228',issue:'Air brake issue',issueDetail:'Low air pressure warning, brakes feel spongy',urgency:'Critical',driveable:'No',jobLocation:'US-83 near Del Rio TX',onsiteContact:'Sofia Mendez',tech:'—',response:'—',revenue:'—',status:'Pending',notes:''},
+  {id:'JOB-4824',date:'Apr 20, 2026',callerName:'Kevin Lane',callbackNumber:'+15104445566',company:'Lane Logistics',fleetName:'LL Express',truckType:'Kenworth T680',truckNumber:'LL-0667',issue:'DEF system warning',issueDetail:'DEF level sensor fault, truck showing incorrect DEF level',urgency:'Medium',driveable:'Yes',jobLocation:'SH-130 near Georgetown TX',onsiteContact:'Kevin Lane',tech:'—',response:'—',revenue:'—',status:'Pending',notes:''},
+  // Assigned
+  {id:'JOB-4825',date:'Apr 20, 2026',callerName:'Diana Reyes',callbackNumber:'+15105556677',company:'Reyes Freight',fleetName:'RF Central',truckType:'Volvo VNL 860',truckNumber:'RF-0334',issue:'Coolant leak',issueDetail:'Radiator hose burst, truck losing coolant rapidly',urgency:'Critical',driveable:'No',jobLocation:'IH-35 S near San Marcos TX',onsiteContact:'Diana Reyes',tech:'Carlos M.',response:'3 min',revenue:'—',status:'Assigned',notes:''},
+  {id:'JOB-4826',date:'Apr 20, 2026',callerName:'Terrence Williams',callbackNumber:'+15106667788',company:'Williams Heavy Haul',fleetName:'WHH Fleet',truckType:'Mack Pinnacle',truckNumber:'WHH-0112',issue:'Turbo boost low',issueDetail:'Truck losing power under load, boost pressure dropping',urgency:'High',driveable:'Limited',jobLocation:'US-77 near Wharton TX',onsiteContact:'Terrence Williams',tech:'Danny R.',response:'5 min',revenue:'—',status:'Assigned',notes:''},
+  {id:'JOB-4827',date:'Apr 20, 2026',callerName:'Rosa Park',callbackNumber:'+15107778899',company:'Park Express LLC',fleetName:'PE West',truckType:'International LT',truckNumber:'PE-0556',issue:'EGR fault',issueDetail:'EGR valve stuck open, excessive white smoke from exhaust',urgency:'High',driveable:'Limited',jobLocation:'SH-6 near College Station TX',onsiteContact:'Rosa Park',tech:'James T.',response:'7 min',revenue:'—',status:'Assigned',notes:''},
+  // En Route
+  {id:'JOB-4828',date:'Apr 20, 2026',callerName:'Henry Ford',callbackNumber:'+15108889900',company:'Ford Freight Inc.',fleetName:'FFI East',truckType:'Peterbilt 579',truckNumber:'FFI-0789',issue:'Power steering failure',issueDetail:'Steering very heavy, fluid leak visible near pump',urgency:'Critical',driveable:'No',jobLocation:'IH-10 E near Beaumont TX',onsiteContact:'Henry Ford',tech:'Marcus W.',response:'4 min',revenue:'—',status:'En Route',notes:''},
+  {id:'JOB-4829',date:'Apr 20, 2026',callerName:'Lily Chen',callbackNumber:'+15109990011',company:'Pacific Rim Trans.',fleetName:'PRT Fleet B',truckType:'Kenworth T880',truckNumber:'PRT-0334',issue:'Electrical fault',issueDetail:'Dash lights flickering, truck losing power intermittently',urgency:'High',driveable:'Limited',jobLocation:'US-59 N near Lufkin TX',onsiteContact:'Lily Chen',tech:'Chris R.',response:'6 min',revenue:'—',status:'En Route',notes:''},
+  // On Site
+  {id:'JOB-4830',date:'Apr 20, 2026',callerName:'Mike Torres',callbackNumber:'+15100001122',company:'Torres Trucking',fleetName:'TT Owner Ops',truckType:'Freightliner Cascadia',truckNumber:'TT-0001',issue:'DPF clogged',issueDetail:'DPF fully clogged, truck in full derate, cannot move',urgency:'Critical',driveable:'No',jobLocation:'Loop 410 near San Antonio TX',onsiteContact:'Mike Torres',tech:'Carlos M.',response:'4 min',revenue:'—',status:'On Site',notes:'Tech on location performing forced regen'},
+  {id:'JOB-4831',date:'Apr 20, 2026',callerName:'Sarah Johnson',callbackNumber:'+15101112233',company:'Johnson Logistics',fleetName:'JL Fleet',truckType:'Volvo VNL 760',truckNumber:'JL-0445',issue:'Fuel injector',issueDetail:'Rough idle, misfire on cylinder 4, suspected injector issue',urgency:'High',driveable:'Yes',jobLocation:'IH-20 E near Tyler TX',onsiteContact:'Sarah Johnson',tech:'Danny R.',response:'8 min',revenue:'—',status:'On Site',notes:'Running diagnostics'},
+  // In Progress
+  {id:'JOB-4832',date:'Apr 20, 2026',callerName:'George Malik',callbackNumber:'+15102223344',company:'Malik Transport',fleetName:'MT North',truckType:'Kenworth T680',truckNumber:'MT-0667',issue:'Brake chamber',issueDetail:'Rear brake chamber cracked, air leaking badly',urgency:'Critical',driveable:'No',jobLocation:'SH-183 near Irving TX',onsiteContact:'George Malik',tech:'James T.',response:'5 min',revenue:'$1,100',status:'In Progress',notes:'Replacing brake chamber, parts on hand'},
+  {id:'JOB-4833',date:'Apr 20, 2026',callerName:'Rachel Kim',callbackNumber:'+15103334455',company:'Kim Cold Chain',fleetName:'KCC Reefer',truckType:'International LT',truckNumber:'KCC-0112',issue:'Reefer unit down',issueDetail:'Thermo King reefer unit not cooling, compressor issue',urgency:'Critical',driveable:'Yes',jobLocation:'IH-35 N near Waco TX',onsiteContact:'Rachel Kim',tech:'Marcus W.',response:'6 min',revenue:'$1,440',status:'In Progress',notes:'Load at risk - working on compressor'},
+  // ── ACTIVE JOBS ──
+  {id:'JOB-4822',date:'Apr 20, 2026',callerName:'Hector Delgado',callbackNumber:'+15112345678',company:'Lone Star Freight',fleetName:'LSF South',truckType:'Kenworth T680',truckNumber:'LSF-0441',issue:'DEF system derate',issueDetail:'Truck in 5 mph derate mode, SCR system fault',urgency:'Critical',driveable:'Limited',jobLocation:'IH-35 S, Exit 141, San Antonio TX',onsiteContact:'Hector Delgado',tech:'Carlos M.',response:'3 min',revenue:'$940',status:'Assigned',notes:''},
+  {id:'JOB-4823',date:'Apr 20, 2026',callerName:'Tamara Reid',callbackNumber:'+15123456789',company:'Gulf Transport LLC',fleetName:'GT Express',truckType:'Peterbilt 579',truckNumber:'GT-0223',issue:'Engine overheating',issueDetail:'Temp gauge maxed out, steam from hood',urgency:'Critical',driveable:'No',jobLocation:'US-90 near Beaumont TX, MM 88',onsiteContact:'Tamara Reid',tech:'Danny R.',response:'5 min',revenue:'$1,180',status:'En Route',notes:''},
+  {id:'JOB-4824',date:'Apr 20, 2026',callerName:'Wayne Okafor',callbackNumber:'+15134567890',company:'Nigerian Eagle Carriers',fleetName:'NEC Fleet A',truckType:'Freightliner Cascadia',truckNumber:'NEC-0089',issue:'Air brake system failure',issueDetail:'Air pressure gauge dropping, cannot build pressure',urgency:'Critical',driveable:'No',jobLocation:'SH-146 near Baytown TX',onsiteContact:'Wayne Okafor',tech:'James T.',response:'7 min',revenue:'$1,040',status:'En Route',notes:''},
+  {id:'JOB-4825',date:'Apr 20, 2026',callerName:'Brianna Watts',callbackNumber:'+15145678901',company:'Watts Intermodal',fleetName:'WI Fleet B',truckType:'Volvo VNL 860',truckNumber:'WI-0334',issue:'Turbo boost pressure loss',issueDetail:'Black smoke under acceleration, loss of power',urgency:'High',driveable:'Limited',jobLocation:'I-10 W near Katy TX, MM 741',onsiteContact:'Brianna Watts',tech:'Carlos M.',response:'4 min',revenue:'$1,320',status:'On Site',notes:''},
+  {id:'JOB-4826',date:'Apr 20, 2026',callerName:'Felix Nguyen',callbackNumber:'+15156789012',company:'Pacific Star Hauling',fleetName:'PSH West',truckType:'International LT',truckNumber:'PSH-0667',issue:'DPF forced regen failure',issueDetail:'Active regen not completing, DPF pressure high',urgency:'High',driveable:'Limited',jobLocation:'US-59 N near Sugar Land TX',onsiteContact:'Felix Nguyen',tech:'Danny R.',response:'6 min',revenue:'$880',status:'On Site',notes:''},
+  {id:'JOB-4827',date:'Apr 20, 2026',callerName:'Carolyn Bishop',callbackNumber:'+15167890123',company:'Bishop Bros Trucking',fleetName:'BBT Fleet',truckType:'Mack Pinnacle',truckNumber:'BBT-0112',issue:'EGR cooler leak',issueDetail:'White smoke from exhaust, coolant level dropping',urgency:'Urgent',driveable:'No',jobLocation:'SH-6 near Missouri City TX',onsiteContact:'Marcus Bishop',tech:'James T.',response:'8 min',revenue:'$1,600',status:'In Progress',notes:''},
+  {id:'JOB-4828',date:'Apr 20, 2026',callerName:'Dwayne Fletcher',callbackNumber:'+15178901234',company:'Fletcher Freight',fleetName:'FF Direct',truckType:'Kenworth W990',truckNumber:'FF-0445',issue:'Electrical short circuit',issueDetail:'Multiple systems failing, electrical burning smell',urgency:'Critical',driveable:'No',jobLocation:'Loop 610 near Greenway TX',onsiteContact:'Dwayne Fletcher',tech:'Marcus W.',response:'5 min',revenue:'$890',status:'In Progress',notes:''},
+  {id:'JOB-4829',date:'Apr 20, 2026',callerName:'Stephanie Cruz',callbackNumber:'+15189012345',company:'Cruz Coastal Carriers',fleetName:'CCC Reefer',truckType:'Peterbilt 389',truckNumber:'CCC-0778',issue:'Fuel injector failure',issueDetail:'Rough idle, misfiring cylinder 4, black smoke',urgency:'High',driveable:'Yes',jobLocation:'IH-45 S near Galveston TX',onsiteContact:'Stephanie Cruz',tech:'Chris R.',response:'4 min',revenue:'$1,240',status:'In Progress',notes:''},
+  {id:'JOB-4830',date:'Apr 20, 2026',callerName:'Bernard King',callbackNumber:'+15190123456',company:'King Logistics',fleetName:'KL Express',truckType:'Volvo VNL 760',truckNumber:'KL-0556',issue:'Coolant system failure',issueDetail:'Major coolant leak, truck overheating rapidly',urgency:'Critical',driveable:'No',jobLocation:'US-290 W near Cypress TX',onsiteContact:'Bernard King',tech:'—',response:'—',revenue:'—',status:'Pending',notes:''},
+  {id:'JOB-4831',date:'Apr 20, 2026',callerName:'Jasmine Powell',callbackNumber:'+15101234567',company:'Powell Premier Transport',fleetName:'PPT Fleet',truckType:'International 9900i',truckNumber:'PPT-0223',issue:'Power steering failure',issueDetail:'Complete loss of power assist, cannot steer safely',urgency:'Critical',driveable:'No',jobLocation:'SH-288 at Pearland TX, MM 22',onsiteContact:'Jasmine Powell',tech:'—',response:'—',revenue:'—',status:'Pending',notes:''},
 ];
 
 const DEMO_TECHS = [
-  {name:'Carlos M.',specialty:'DEF / Aftertreatment Specialist',on_duty:true,priority:1,login_id:'carlos.m',jobs:89,avgResp:'3.4 min',acceptRate:'97%',revenue:'$21,400'},
-  {name:'Danny R.',specialty:'Engine Diagnostics & Repair',on_duty:true,priority:2,login_id:'danny.r',jobs:74,avgResp:'4.1 min',acceptRate:'94%',revenue:'$18,200'},
-  {name:'James T.',specialty:'Electrical / Fuel Systems',on_duty:true,priority:3,login_id:'james.t',jobs:62,avgResp:'5.2 min',acceptRate:'91%',revenue:'$14,800'},
-  {name:'Marcus W.',specialty:'Brake / Suspension / Air Systems',on_duty:false,priority:4,login_id:'marcus.w',jobs:41,avgResp:'4.8 min',acceptRate:'89%',revenue:'$9,600'},
-  {name:'Chris R.',specialty:'Mobile Diesel Repair',on_duty:true,priority:5,login_id:'chris.r',jobs:38,avgResp:'4.5 min',acceptRate:'92%',revenue:'$8,840'},
+  {name:'Carlos M.',specialty:'DEF / Aftertreatment Specialist',on_duty:true,priority:1,login_id:'carlos.m',password:'tech2026',jobs:89,avgResp:'3.4 min',acceptRate:'97%',revenue:'$21,400'},
+  {name:'Danny R.',specialty:'Engine Diagnostics & Repair',on_duty:true,priority:2,login_id:'danny.r',password:'tech2026',jobs:74,avgResp:'4.1 min',acceptRate:'94%',revenue:'$18,200'},
+  {name:'James T.',specialty:'Electrical / Fuel Systems',on_duty:true,priority:3,login_id:'james.t',password:'tech2026',jobs:62,avgResp:'5.2 min',acceptRate:'91%',revenue:'$14,800'},
+  {name:'Marcus W.',specialty:'Brake / Suspension / Air Systems',on_duty:false,priority:4,login_id:'marcus.w',password:'tech2026',jobs:41,avgResp:'4.8 min',acceptRate:'89%',revenue:'$9,600'},
+  {name:'Chris R.',specialty:'Mobile Diesel Repair',on_duty:true,priority:5,login_id:'chris.r',password:'dispatch2026',jobs:38,avgResp:'4.5 min',acceptRate:'92%',revenue:'$8,840'},
 ];
 
-let viewMode = 'pipeline', charts = {};
+let viewMode = 'pipeline', charts = {}, demoRole = 'owner', aiOpen = false, aiHistory = [], currentTechDemo = null;
+
+// ── ROLE SWITCH ────────────────────────────────────────
+function setDemoRole(role) {
+  demoRole = role;
+  const ob = document.getElementById('roleOwner');
+  const tb = document.getElementById('roleTech');
+  const label = document.getElementById('loginIdLabel');
+  const input = document.getElementById('inputUser');
+  if(role === 'owner') {
+    ob.style.background = 'var(--primary)'; ob.style.color = '#fff';
+    tb.style.background = 'var(--bg-base)'; tb.style.color = 'var(--text-muted)';
+    label.textContent = 'Business ID';
+    input.placeholder = 'Enter your business ID';
+  } else {
+    tb.style.background = 'var(--primary)'; tb.style.color = '#fff';
+    ob.style.background = 'var(--bg-base)'; ob.style.color = 'var(--text-muted)';
+    label.textContent = 'Tech ID';
+    input.placeholder = 'Enter your tech ID';
+  }
+}
 
 // ── LOGIN ──────────────────────────────────────────────
 function doLogin() {
   const user = document.getElementById('inputUser').value.trim().toLowerCase();
   const pass = document.getElementById('inputPass').value;
   const err = document.getElementById('loginError');
-  if(user === 'lonestar' && pass === 'diesel2026') {
+
+  if(demoRole === 'owner' && user === 'lonestar' && pass === 'diesel2026') {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').classList.add('active');
-    startClock();
-    initDashboard();
+    document.getElementById('aiToggleBtn').style.display = 'flex';
+    startClock(); initDashboard();
+  } else if(demoRole === 'tech') {
+    const tech = DEMO_TECHS.find(t => t.login_id === user && pass === 'tech2026');
+    if(tech) {
+      currentTechDemo = tech;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('techDashboard').style.display = 'block';
+      document.getElementById('aiToggleBtn').style.display = 'flex';
+      startClock(); initTechDashboard(tech);
+    } else {
+      err.style.display = 'block';
+      err.textContent = 'Try: carlos.m / tech2026 (or danny.r, james.t, marcus.w, chris.r)';
+    }
   } else {
     err.style.display = 'block';
-    err.textContent = 'Invalid credentials. Try: lonestar / diesel2026';
+    err.textContent = 'Owner: lonestar/diesel2026 | Tech: carlos.m/tech2026';
   }
 }
 
 function doLogout() {
   document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('dashboard').style.display = '';
+  document.getElementById('techDashboard').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('inputUser').value = '';
   document.getElementById('inputPass').value = '';
   document.getElementById('loginError').style.display = 'none';
+  document.getElementById('aiToggleBtn').style.display = 'none';
+  document.getElementById('aiChatWidget').style.display = 'none';
+  aiOpen = false; aiHistory = []; currentTechDemo = null;
   Object.values(charts).forEach(c=>c.destroy()); charts={};
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-overview').classList.add('active');
+  const ov = document.getElementById('tab-overview');
+  if(ov) { ov.classList.add('active'); }
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector('.nav-tab[data-tab="overview"]').classList.add('active');
+  const ovTab = document.querySelector('.nav-tab[data-tab="overview"]');
+  if(ovTab) ovTab.classList.add('active');
+  setDemoRole('owner');
+}
+
+// ── TECH DASHBOARD ─────────────────────────────────────
+function initTechDashboard(tech) {
+  // header
+  document.getElementById('headerClientName').textContent = tech.name;
+  document.getElementById('headerClientMeta').textContent = tech.specialty + ' · Lone Star Diesel Repair';
+  document.getElementById('headerRoleBadge') && (document.getElementById('headerRoleBadge').textContent = 'TECHNICIAN');
+
+  // Tech nav
+  document.getElementById('techNavTabs').addEventListener('click', e => {
+    if(!e.target.dataset.techTab) return;
+    document.querySelectorAll('#techNavTabs .nav-tab').forEach(t=>t.classList.remove('active'));
+    e.target.classList.add('active');
+    document.querySelectorAll('[id^="techTab-"]').forEach(t=>t.classList.remove('active'));
+    document.getElementById('techTab-'+e.target.dataset.techTab)?.classList.add('active');
+  });
+
+  // Hero card
+  const myJobs = DEMO_JOBS.filter(j => j.tech === tech.name);
+  const activeJob = myJobs.find(j => ['Assigned','En Route','On Site','In Progress'].includes(j.status));
+  const thn = document.getElementById('techHeaderName');
+  if(thn) thn.innerHTML = '<span style="font-size:16px;font-weight:600;color:var(--text-secondary)">'+tech.name+'</span><br><span style="font-size:12px;color:var(--text-dim)">'+tech.specialty+'</span>';
+  document.getElementById('techHeroSection').innerHTML = `
+    <div style="background:linear-gradient(145deg,var(--bg-elevated),var(--bg-card));border:1px solid var(--border-light);border-radius:16px;padding:28px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${tech.on_duty?'var(--green)':'var(--red)'}"></div>
+      <div style="font-family:var(--font-display);font-size:28px;font-weight:700;margin-bottom:4px">${tech.name}</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:18px">${tech.specialty} · Lone Star Diesel Repair</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:30px;background:${tech.on_duty?'var(--green-dim)':'var(--red-dim)'};border:1px solid ${tech.on_duty?'rgba(34,197,94,0.3)':'rgba(239,68,68,0.3)'};margin-bottom:20px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${tech.on_duty?'var(--green)':'var(--red)'}"></span>
+        <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:${tech.on_duty?'var(--green)':'var(--red)'}">${tech.on_duty?'ON DUTY':'OFF DUTY'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+        <div style="text-align:center"><div style="font-family:var(--font-heading);font-size:30px;font-weight:600;color:var(--primary)">${tech.jobs}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Jobs This Month</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-heading);font-size:30px;font-weight:600;color:var(--green)">${tech.avgResp}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Avg Response</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-heading);font-size:30px;font-weight:600;color:var(--green)">${tech.acceptRate}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Accept Rate</div></div>
+        <div style="text-align:center"><div style="font-family:var(--font-heading);font-size:30px;font-weight:600;color:var(--green)">${tech.revenue}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">Revenue</div></div>
+      </div>
+      ${activeJob ? `<div style="margin-top:18px;background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:12px 16px;text-align:left">
+        <div style="font-size:11px;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🔴 Active Job — ${activeJob.id}</div>
+        <div style="font-size:13px;color:var(--text-primary);font-weight:500">${activeJob.company} · ${activeJob.issue}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${activeJob.jobLocation}</div>
+        <div style="margin-top:6px">${badge(activeJob.status)}</div>
+      </div>` : ''}
+    </div>`;
+
+  // Shift grid
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const times = ['6a–6p','6a–6p','6a–6p','6a–6p','6a–6p','8a–2p','Off'];
+  document.getElementById('techShiftGrid').innerHTML = days.map((d,i) =>
+    `<div style="background:var(--bg-card);border:1px solid ${times[i]==='Off'?'var(--border)':'rgba(249,115,22,0.3)'};border-radius:8px;padding:10px;text-align:center;opacity:${times[i]==='Off'?0.4:1}">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;margin-bottom:3px">${d}</div>
+      <div style="font-size:12px;color:${times[i]==='Off'?'var(--text-muted)':'var(--primary)'}">${times[i]}</div>
+    </div>`).join('');
+
+  // Notes from dispatch
+  const notes = [
+    {text:"Great work on JOB-4819. Fast response on that air brake — client called to say thanks.", date:'Apr 20, 2026 9:15 AM'},
+    {text:"Reminder: DEF fluid restock in the van before your next shift. We are running low on the 2.5 gal jugs.", date:'Apr 19, 2026 4:30 PM'},
+    {text:"You are the #1 tech this month. Keep it up — your numbers are impressive.", date:'Apr 18, 2026 11:00 AM'},
+  ];
+  document.getElementById('techNotesSection').innerHTML = notes.map(n =>
+    `<div style="background:var(--bg-base);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px">
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.5">${n.text}</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px">${n.date}</div>
+    </div>`).join('');
+
+  // My jobs table
+  document.getElementById('techJobsBody').innerHTML = myJobs.map(j =>
+    `<tr class="clickable-row" onclick="openModal('${j.id}')">
+      <td style="color:var(--primary);font-weight:600">${j.id}</td>
+      <td class="td-dim">${j.date}</td>
+      <td class="td-bold">${j.company}</td>
+      <td class="td-dim">${j.issue}</td>
+      <td>${j.response}</td>
+      <td style="color:var(--green)">${j.revenue}</td>
+      <td>${badge(j.status)}</td>
+    </tr>`).join('');
+
+  // Performance chart
+  setTimeout(() => {
+    const ctx = document.getElementById('chartTechMyPerf');
+    if(ctx && !charts.myPerf) {
+      const cDef = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#1e1e1e'},ticks:{color:'#555',font:{family:'Barlow Condensed',size:12}}},y:{grid:{color:'#1e1e1e'},ticks:{color:'#555',font:{family:'Barlow Condensed',size:12}}}}};
+      charts.myPerf = new Chart(ctx, {type:'bar',data:{labels:['Week 1','Week 2','Week 3','Week 4'],datasets:[{label:'Jobs',data:[20,24,28,17],backgroundColor:'rgba(249,115,22,0.7)',borderRadius:4}]},options:cDef});
+    }
+  }, 200);
+
+  // Tech insights
+  document.getElementById('techInsightsList').innerHTML = [
+    {icon:'⚡', text:"Your avg response time of "+tech.avgResp+' is the fastest on the team. That directly increases your job acceptance rate.'},
+    {icon:'🔧', text:"You have handled "+tech.jobs+' jobs this month. Stay responsive during 6–9 AM peak hours to keep your #1 ranking.'},
+    {icon:'💰', text:"You have generated "+tech.revenue+' in revenue this month. Updating job status to Completed helps the owner track billing.'},
+    {icon:'📈', text:"Your "+tech.acceptRate+' accept rate is exceptional. The faster you confirm jobs, the higher your dispatch priority stays.'},
+  ].map(i => `<div class="insight-card"><span class="insight-icon">${i.icon}</span><span class="insight-text">${i.text}</span></div>`).join('');
 }
 
 // ── CLOCK ──────────────────────────────────────────────
 function startClock() {
   const tick = () => {
     const el = document.getElementById('liveClock');
-    if(!el) return;
+    const el2 = document.getElementById('techClock');
     const now = new Date();
-    el.textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+    const str = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});
+    if(el) el.textContent = str;
+    if(el2) el2.textContent = str;
   };
   tick(); setInterval(tick, 1000);
 }
@@ -444,7 +745,10 @@ function startClock() {
 // ── NAV ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.nav-tabs').addEventListener('click', e => {
-    if(e.target.classList.contains('nav-tab')) switchTab(e.target.dataset.tab);
+    if(e.target.classList.contains('nav-tab')) {
+      switchTab(e.target.dataset.tab);
+      if(e.target.dataset.tab==='settings') { setTimeout(renderTranscripts,50); }
+    }
   });
 });
 
@@ -564,7 +868,7 @@ function renderTechs() {
     const bar = Math.round((t.jobs / 89) * 100);
     const rankColors = ['var(--primary)','var(--green)','#60a5fa','var(--yellow)','#c084fc'];
     const rankLabels = ['#1 Top Performer','#2 Strong','#3 Solid','#4 Good','#5 Developing'];
-    return `<div class="tech-card" style="cursor:pointer;border-left:3px solid ${rankColors[i]}" onclick="openTechProfile(${i})">
+    return `<div class="tech-card" style="border-left:3px solid ${rankColors[i]}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
         <div style="flex:1;min-width:200px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
@@ -578,7 +882,7 @@ function renderTechs() {
                 </span>
                 <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:${rankColors[i]}22;color:${rankColors[i]};font-weight:700;border:1px solid ${rankColors[i]}44">${rankLabels[i]}</span>
               </div>
-              <div class="tech-meta">${t.specialty} · Login: ${t.login_id}</div>
+              <div class="tech-meta">${t.specialty} · Login: <span style="color:var(--primary);font-weight:600">${t.login_id}</span> · Pass: <span style="color:var(--text-secondary)">${t.password||"tech2026"}</span></div>
             </div>
           </div>
           <div style="margin-top:10px">
@@ -598,6 +902,20 @@ function renderTechs() {
           <div><div class="tech-stat-num" style="font-size:20px;color:var(--green)">${t.revenue}</div><div class="tech-stat-label">Revenue</div></div>
         </div>
       </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <div style="position:relative;width:52px;height:28px">
+            <input type="checkbox" ${t.on_duty?'checked':''} onchange="toggleTechDuty(${i},this.checked)" style="opacity:0;width:0;height:0;position:absolute">
+            <span id="slider-${i}" onclick="toggleTechDuty(${i},!DEMO_TECHS[${i}].on_duty)" style="position:absolute;top:0;left:0;right:0;bottom:0;background:${t.on_duty?'rgba(34,197,94,0.3)':'#333'};border-radius:28px;transition:all .3s;border:2px solid ${t.on_duty?'var(--green)':'#444'};cursor:pointer">
+              <span style="position:absolute;width:20px;height:20px;border-radius:50%;background:${t.on_duty?'var(--green)':'#888'};top:2px;left:${t.on_duty?'26':'2'}px;transition:all .3s;${t.on_duty?'box-shadow:0 0 10px rgba(34,197,94,0.4)':''}"></span>
+            </span>
+          </div>
+          <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${t.on_duty?'var(--green)':'var(--red)'}" id="duty-label-${i}">${t.on_duty?'On Duty':'Off Duty'}</span>
+        </label>
+        <button onclick="openTechProfile(${i})" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:5px 14px;border-radius:6px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">View Profile</button>
+        <button onclick="openEditSchedule(${i})" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:5px 14px;border-radius:6px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='#60a5fa'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">Edit Schedule</button>
+        <button onclick="removeTech(${i})" style="background:transparent;border:1px solid rgba(239,68,68,0.3);color:var(--red);padding:5px 14px;border-radius:6px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-left:auto">Remove</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -607,7 +925,7 @@ function openTechProfile(idx) {
   const rankColors = ['var(--primary)','var(--green)','#60a5fa','var(--yellow)','#c084fc'];
   const color = rankColors[idx];
   document.getElementById('techModalName').innerHTML = `<span style="color:${color}">${t.name}</span>`;
-  document.getElementById('techModalMeta').textContent = t.specialty + ' · Priority ' + t.priority + ' · Login: ' + t.login_id;
+  document.getElementById('techModalMeta').innerHTML = t.specialty + ' · Priority ' + t.priority + ' &nbsp;|&nbsp; Login: <strong style="color:var(--primary)">' + t.login_id + '</strong> &nbsp;|&nbsp; Password: <strong>' + (t.password||'tech2026') + '</strong>';
   const recentJobs = DEMO_JOBS.filter(j => j.tech === t.name).slice(0,5);
   document.getElementById('techModalBody').innerHTML = `
     <div class="detail-section">
@@ -661,15 +979,250 @@ function closeTechModal() {
   document.body.style.overflow = '';
 }
 
+// ── DUTY TOGGLE ────────────────────────────────────────
+function toggleTechDuty(idx, on) {
+  DEMO_TECHS[idx].on_duty = on;
+  renderTechs();
+  showDemoToast(on ? DEMO_TECHS[idx].name+' is now On Duty' : DEMO_TECHS[idx].name+' is now Off Duty');
+}
+
+// ── REMOVE TECH ────────────────────────────────────────
+function removeTech(idx) {
+  const name = DEMO_TECHS[idx].name;
+  if(!confirm('Remove '+name+' from the roster?')) return;
+  DEMO_TECHS.splice(idx, 1);
+  renderTechs();
+  showDemoToast(name+' removed from roster');
+}
+
+// ── ADD TECH ────────────────────────────────────────────
+function openAddTech() {
+  document.getElementById('addTechModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAddTech() {
+  document.getElementById('addTechModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function addTech() {
+  const name = document.getElementById('nt-name').value.trim();
+  const spec = document.getElementById('nt-spec').value.trim();
+  const login = document.getElementById('nt-login').value.trim();
+  const priority = parseInt(document.getElementById('nt-priority').value)||DEMO_TECHS.length+1;
+  if(!name){alert('Name is required');return;}
+  DEMO_TECHS.push({name,specialty:spec||'General Repair',on_duty:false,priority,login_id:login||name.toLowerCase().replace(' ','.'),jobs:0,avgResp:'—',acceptRate:'—',revenue:'$0'});
+  renderTechs();
+  const msg = document.getElementById('addTechMsg');
+  if(msg){msg.style.display='block';setTimeout(()=>{msg.style.display='none';closeAddTech();},1500);}
+  ['nt-name','nt-spec','nt-login','nt-priority'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showDemoToast(name+' added to roster');
+}
+
+// ── EDIT SCHEDULE ───────────────────────────────────────
+function openEditSchedule(idx) {
+  const t = DEMO_TECHS[idx];
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const defaultTimes = ['6a-6p','6a-6p','6a-6p','6a-6p','6a-6p','8a-2p','Off'];
+  const shift = t.shift || {};
+  const html = `<div style="padding:20px">
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:4px">${t.name} — <span style="color:var(--primary)">Schedule</span></div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Enter shift times (e.g. 6a-6p) or Off</p>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:20px">
+      ${days.map((d,i)=>`<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;margin-bottom:6px">${d}</div>
+        <input id="sch-${d}" value="${shift[d]||defaultTimes[i]}" style="width:100%;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;padding:4px 2px;color:var(--text-primary);font-family:var(--font-body);font-size:11px;text-align:center;outline:none">
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="saveSchedule(${idx})" style="flex:1;padding:10px;background:linear-gradient(135deg,var(--primary),#EA580C);border:none;border-radius:8px;color:#fff;font-family:var(--font-display);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer">Save Schedule</button>
+      <button onclick="closeScheduleModal()" style="padding:10px 20px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-family:var(--font-body);font-size:13px;cursor:pointer">Cancel</button>
+    </div>
+    <p id="schSaved" style="display:none;text-align:center;font-size:13px;color:var(--green);margin-top:10px">✓ Schedule saved</p>
+  </div>`;
+  // Reuse the tech profile modal
+  document.getElementById('techModalName').innerHTML = '';
+  document.getElementById('techModalMeta').textContent = '';
+  document.getElementById('techModalBody').innerHTML = html;
+  document.getElementById('techProfileModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('techProfileModal')._scheduleIdx = idx;
+}
+
+function saveSchedule(idx) {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const shift = {};
+  days.forEach(d => { shift[d] = document.getElementById('sch-'+d)?.value.trim()||'Off'; });
+  DEMO_TECHS[idx].shift = shift;
+  const msg = document.getElementById('schSaved');
+  if(msg){msg.style.display='block';setTimeout(()=>{msg.style.display='none';closeScheduleModal();renderTechs();},1000);}
+  showDemoToast('Schedule saved for '+DEMO_TECHS[idx].name);
+}
+
+function closeScheduleModal() {
+  document.getElementById('techProfileModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── SETTINGS ────────────────────────────────────────────
+function savePortalSettings() {
+  const biz = document.getElementById('s-biz')?.value.trim();
+  const owner = document.getElementById('s-owner')?.value.trim();
+  const loc = document.getElementById('s-loc')?.value.trim();
+  if(biz) document.getElementById('headerClientName')?.textContent === undefined || (document.getElementById('ownerBizName') && (document.getElementById('ownerBizName').textContent = biz));
+  const saved = document.getElementById('settingsSaved');
+  if(saved){saved.style.display='inline';setTimeout(()=>saved.style.display='none',2000);}
+  showDemoToast('Settings saved');
+}
+
+// ── TRANSCRIPTS ─────────────────────────────────────────
+const DEMO_TRANSCRIPTS = [
+  {id:"CALL-2847",date:"Apr 20, 2026",time:"2:14 AM",caller:"Marcus Webb",company:"Western Freight Co.",duration:"3m 42s",jobCreated:"JOB-4821",messages:[
+    {from:"daniel",txt:"Diesel Growth, this is Daniel. What can I help you with?"},
+    {from:"caller",txt:"Yeah hey, I got a truck down on I-10 eastbound. DEF system throwing faults, truck going into derate."},
+    {from:"daniel",txt:"Okay I got you. Lets move. Give me your name, first and last?"},
+    {from:"caller",txt:"Marcus Webb."},
+    {from:"daniel",txt:"Got it Marcus. Best callback number?"},
+    {from:"caller",txt:"510-789-1234."},
+    {from:"daniel",txt:"Perfect. What company or fleet are you running with?"},
+    {from:"caller",txt:"Western Freight Co., WFC Express fleet."},
+    {from:"daniel",txt:"Got it. What type of truck and unit number?"},
+    {from:"caller",txt:"Kenworth T680, unit WF-2241."},
+    {from:"daniel",txt:"Okay so the DEF system is faulting. Is the truck in derate right now or completely down?"},
+    {from:"caller",txt:"In derate. I can still move but barely. Maybe 5 mph max."},
+    {from:"daniel",txt:"Understood, we will treat this as urgent. Where are you exactly?"},
+    {from:"caller",txt:"I-10 eastbound, around mile marker 142. Near Houston."},
+    {from:"daniel",txt:"Got the location. Who is on-site with the truck right now?"},
+    {from:"caller",txt:"Just me, Marcus Webb."},
+    {from:"daniel",txt:"Alright — Kenworth T680 unit WF-2241, Western Freight Co., DEF system fault, truck in derate at I-10 E mile marker 142. Urgent. On-site contact is Marcus Webb. Does that all sound right?"},
+    {from:"caller",txt:"Yeah that is correct."},
+    {from:"daniel",txt:"Perfect. Sending to dispatch right now. Callback is 510-789-1234. We will get someone moving on this. Take care."},
+  ]},
+  {id:"CALL-2846",date:"Apr 20, 2026",time:"1:52 AM",caller:"Darnell Hughes",company:"Gulf Coast Carriers",duration:"4m 15s",jobCreated:"JOB-4820",messages:[
+    {from:"daniel",txt:"Diesel Growth, this is Daniel. What can I help you with?"},
+    {from:"caller",txt:"My truck is overheating bad. I pulled over on 59 South near Rosenberg. Coolant leaking everywhere."},
+    {from:"daniel",txt:"Okay I got you. Name, first and last?"},
+    {from:"caller",txt:"Darnell Hughes."},
+    {from:"daniel",txt:"Got it Darnell. Best callback number?"},
+    {from:"caller",txt:"510-234-5678."},
+    {from:"daniel",txt:"Company and fleet name?"},
+    {from:"caller",txt:"Gulf Coast Carriers, GCC Fleet."},
+    {from:"daniel",txt:"Truck type and unit number?"},
+    {from:"caller",txt:"Peterbilt 579, GCC-0089."},
+    {from:"daniel",txt:"Coolant leak. Is the truck driveable or is it down?"},
+    {from:"caller",txt:"It is down. I killed the engine when the temp hit red. Cannot move it."},
+    {from:"daniel",txt:"Understood, we will treat this as a priority. Where are you exactly?"},
+    {from:"caller",txt:"US-59 South, just south of Rosenberg. Around mile 28."},
+    {from:"daniel",txt:"Got the location. Who is on-site?"},
+    {from:"caller",txt:"Just me."},
+    {from:"daniel",txt:"Peterbilt 579 unit GCC-0089, Gulf Coast Carriers. Engine overheating, coolant leak, truck is down, on US-59 S near Rosenberg. Correct?"},
+    {from:"caller",txt:"Yes sir."},
+    {from:"daniel",txt:"Perfect. Sending to dispatch now. Take care Darnell."},
+  ]},
+  {id:"CALL-2845",date:"Apr 19, 2026",time:"11:38 PM",caller:"Travis Boudreaux",company:"Bayou Freight Lines",duration:"3m 28s",jobCreated:"JOB-4817",messages:[
+    {from:"daniel",txt:"Diesel Growth, this is Daniel. What can I help you with?"},
+    {from:"caller",txt:"Transmission is slipping on my truck. I am on 45 North near Conroe. Still moving but keeps losing gears."},
+    {from:"daniel",txt:"Absolutely, let me get this logged. First and last name?"},
+    {from:"caller",txt:"Travis Boudreaux."},
+    {from:"daniel",txt:"Thanks Travis. Best callback number?"},
+    {from:"caller",txt:"510-567-8901."},
+    {from:"daniel",txt:"Company and fleet name?"},
+    {from:"caller",txt:"Bayou Freight Lines, Bayou Express fleet."},
+    {from:"daniel",txt:"Truck type and unit number?"},
+    {from:"caller",txt:"Mack Anthem, unit BFL-0567."},
+    {from:"daniel",txt:"Transmission slipping. Is the truck driveable right now?"},
+    {from:"caller",txt:"Yeah I can still drive it but getting worse. Slips bad between 3rd and 4th."},
+    {from:"daniel",txt:"Got it. Location?"},
+    {from:"caller",txt:"I-45 North, around the Conroe area. Exit 90 maybe."},
+    {from:"daniel",txt:"And on-site contact?"},
+    {from:"caller",txt:"Travis Boudreaux, just me."},
+    {from:"daniel",txt:"Last thing. Is this urgent and needs someone today?"},
+    {from:"caller",txt:"Yeah today for sure. Getting worse."},
+    {from:"daniel",txt:"Got everything. Mack Anthem BFL-0567, Bayou Freight Lines, transmission slipping on I-45 N near Conroe. Sending to dispatch now."},
+  ]},
+  {id:"CALL-2844",date:"Apr 19, 2026",time:"10:22 PM",caller:"Angela Torres",company:"Rio Grande Hauling",duration:"3m 55s",jobCreated:"JOB-4816",messages:[
+    {from:"daniel",txt:"Diesel Growth, this is Daniel. What can I help you with?"},
+    {from:"caller",txt:"DPF light came on and now the truck is in derate. Tried to do a forced regen and it will not work."},
+    {from:"daniel",txt:"Okay let me get you set up. First and last name?"},
+    {from:"caller",txt:"Angela Torres."},
+    {from:"daniel",txt:"Best callback number?"},
+    {from:"caller",txt:"510-678-9012."},
+    {from:"daniel",txt:"Company and fleet?"},
+    {from:"caller",txt:"Rio Grande Hauling. Fleet name is RGH Intermodal."},
+    {from:"daniel",txt:"Truck type and unit number?"},
+    {from:"caller",txt:"International LT, RGH-0890."},
+    {from:"daniel",txt:"DPF regeneration failure. Is the truck driveable at all?"},
+    {from:"caller",txt:"Limited. In derate so moving slow but I can move."},
+    {from:"daniel",txt:"Location?"},
+    {from:"caller",txt:"IH-10 West, near Katy Texas. Around Pin Oak Road exit."},
+    {from:"daniel",txt:"On-site contact?"},
+    {from:"caller",txt:"Angela Torres, that is me."},
+    {from:"daniel",txt:"Got it. International LT RGH-0890, Rio Grande Hauling, DPF regen failure, truck in derate on IH-10 W near Katy. Sending to dispatch now."},
+  ]},
+];
+
+function renderTranscripts() {
+  const el = document.getElementById('transcriptsList');
+  if(!el) return;
+  el.innerHTML = DEMO_TRANSCRIPTS.map((call,ci)=>`
+    <div style="background:var(--bg-base);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <div style="padding:14px 18px;background:var(--bg-elevated);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;flex-wrap:wrap;gap:8px" onclick="toggleTranscript(${ci})">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-dim);border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:16px">📞</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-primary)">${call.caller} <span style="font-size:12px;color:var(--text-muted);font-weight:400">· ${call.company}</span></div>
+            <div style="font-size:12px;color:var(--text-muted)">${call.date} at ${call.time} · ${call.duration}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,0.2)">Job Created: ${call.jobCreated}</span>
+          <span style="font-size:14px;color:var(--text-muted)" id="tc-arrow-${ci}">▼</span>
+        </div>
+      </div>
+      <div id="tc-body-${ci}" style="display:none;padding:16px 18px">
+        <div style="display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto">
+          ${call.messages.map(m=>`
+            <div style="display:flex;${m.from==="caller"?'justify-content:flex-end':''};gap:8px;align-items:flex-start">
+              ${m.from==="daniel"?`<div style="width:28px;height:28px;border-radius:50%;background:var(--primary-dim);border:1px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);flex-shrink:0">AI</div>`:''}
+              <div style="max-width:75%;padding:10px 14px;border-radius:${m.from==="daniel"?'4px 14px 14px 14px':'14px 4px 14px 14px'};background:${m.from==="daniel"?'var(--bg-elevated)':'var(--primary-dim)'};border:1px solid ${m.from==="daniel"?'var(--border)':'rgba(249,115,22,0.3)'};font-size:13px;color:${m.from==="daniel"?'var(--text-secondary)':'var(--text-primary)'};line-height:1.5">${m.txt}</div>
+              ${m.from==="caller"?`<div style="width:28px;height:28px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-muted);flex-shrink:0">C</div>`:''}
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleTranscript(ci) {
+  const body = document.getElementById('tc-body-'+ci);
+  const arrow = document.getElementById('tc-arrow-'+ci);
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if(arrow) arrow.textContent = open ? '▼' : '▲';
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function showDemoToast(msg) {
+  let t = document.getElementById('demoToast');
+  if(!t) {
+    t = document.createElement('div');
+    t.id = 'demoToast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--bg-elevated);border:1px solid var(--border-light);border-left:3px solid var(--green);border-radius:10px;padding:12px 20px;font-size:13px;color:var(--text-primary);z-index:9999;font-family:var(--font-body)';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.style.display='none', 2800);
+}
+
 // ── INSIGHTS ───────────────────────────────────────────
 function renderInsights() {
   const insights = [
-    {icon:'🔥', text:'DEF system jobs are your #1 issue type this month at 31% of all calls — Carlos M. handles them fastest at 3.4 min avg response.'},
-    {icon:'📞', text:'38% of callers this month are repeat customers — up from 24% last month. Strong sign clients trust the service.'},
-    {icon:'💰', text:'Average job value hit $834 this month — up 9% vs last month. Turbocharger and fuel system jobs are driving the increase.'},
-    {icon:'⚡', text:'Response time dropped to 3.8 min avg — down from 4.9 min last month. The AI dispatch system is working.'},
-    {icon:'📈', text:'Job volume up 18% vs last month with only 2 missed calls — the AI receptionist is capturing nearly every inbound call.'},
-    {icon:'🌟', text:'You exceeded your $60,000 revenue goal by 4.7% — first month hitting the goal since launch.'},
+    {icon:'🔥', text:"DEF system jobs are your #1 issue type this month at 31% of all calls — Carlos M. handles them fastest at 3.4 min avg response."},
+    {icon:'📞', text:"38% of callers this month are repeat customers — up from 24% last month. Strong sign clients trust the service."},
+    {icon:'💰', text:"Average job value hit $834 this month — up 9% vs last month. Turbocharger and fuel system jobs are driving the increase."},
+    {icon:'⚡', text:"Response time dropped to 3.8 min avg — down from 4.9 min last month. The AI dispatch system is working."},
+    {icon:'📈', text:"Job volume up 18% vs last month with only 2 missed calls — the AI receptionist is capturing nearly every inbound call."},
+    {icon:'🌟', text:"You exceeded your $60,000 revenue goal by 4.7% — first month hitting the goal since launch."},
   ];
   document.getElementById('insightsList').innerHTML = insights.map(i =>
     `<div class="insight-card"><span class="insight-icon">${i.icon}</span><span class="insight-text">${i.text}</span></div>`).join('');
@@ -730,6 +1283,76 @@ function badge(st) {
   return `<span class="badge ${m[st]||'badge-gray'}">${st}</span>`;
 }
 
+// ── AI CHAT ────────────────────────────────────────────
+function toggleAI() {
+  aiOpen = !aiOpen;
+  const widget = document.getElementById('aiChatWidget');
+  const btn = document.getElementById('aiToggleBtn');
+  if(aiOpen) {
+    widget.style.display = 'flex';
+    btn.style.display = 'none';
+    document.getElementById('aiInput')?.focus();
+  } else {
+    widget.style.display = 'none';
+    btn.style.display = 'flex';
+  }
+}
+
+function quickAsk(msg) {
+  document.getElementById('aiInput').value = msg;
+  sendAI();
+}
+
+async function sendAI() {
+  const input = document.getElementById('aiInput');
+  const msg = input?.value.trim();
+  if(!msg) return;
+  input.value = '';
+  const el = document.getElementById('aiMsgs');
+  if(!el) return;
+
+  el.innerHTML += `<div style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.2);border-radius:10px 10px 2px 10px;padding:9px 12px;font-size:13px;color:var(--text-primary);align-self:flex-end;max-width:85%;margin-left:auto">${msg}</div>`;
+
+  const loadId = 'load-'+Date.now();
+  el.innerHTML += `<div id="${loadId}" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px 10px 10px 2px;padding:9px 12px;font-size:13px;color:var(--text-muted)">Thinking...</div>`;
+  el.scrollTop = el.scrollHeight;
+
+  // Build context from demo data
+  const activeJobs = DEMO_JOBS.filter(j=>['Assigned','En Route','On Site','In Progress'].includes(j.status));
+  const pendingJobs = DEMO_JOBS.filter(j=>j.status==='Pending');
+  const onDutyTechs = DEMO_TECHS.filter(t=>t.on_duty);
+  const context = 'You are a dispatch operations AI assistant for Lone Star Diesel Repair, a heavy-duty diesel repair company using the Diesel Growth dispatch platform. '
+    + 'Current live data: '+DEMO_JOBS.length+' total jobs this month, '+activeJobs.length+' active right now ('+activeJobs.map(j=>j.id+' '+j.status).join(', ')+'), '
+    + pendingJobs.length+' pending dispatch. '
+    + onDutyTechs.length+' techs on duty: '+onDutyTechs.map(t=>t.name).join(', ')+'. '
+    + 'Revenue this month: $62,840 (104% of goal). Top tech: Carlos M. with 89 jobs and 3.4 min avg response. '
+    + 'Be helpful, specific, and concise. Reference actual data when answering. Keep responses under 3 sentences unless asked for more.';
+
+  aiHistory.push({role:'user',content:msg});
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:context,
+        messages:aiHistory.slice(-10)
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, could not get a response right now.';
+    aiHistory.push({role:'assistant',content:reply});
+    const loadEl = document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML = `<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px 10px 10px 2px;padding:9px 12px;font-size:13px;color:var(--text-secondary);line-height:1.55">${reply}</div>`;
+  } catch(e) {
+    const loadEl = document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML = `<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px 10px 10px 2px;padding:9px 12px;font-size:13px;color:var(--red)">Connection error. Try again.</div>`;
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
 // ── CHARTS ─────────────────────────────────────────────
 function buildCharts() {
   const cDef = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#1e1e1e'},ticks:{color:'#555',font:{family:'Barlow Condensed',size:12}}},y:{grid:{color:'#1e1e1e'},ticks:{color:'#555',font:{family:'Barlow Condensed',size:12}}}}};
@@ -761,6 +1384,167 @@ function buildCharts() {
 
   charts.techAccept = new Chart(document.getElementById('chartTechAccept'), {type:'bar',data:{labels:techNames,datasets:[{label:'Accept Rate',data:[97,94,91,89,92],backgroundColor:techColors,borderRadius:4}]},options:{...cDef,scales:{...cDef.scales,y:{...cDef.scales.y,max:100,ticks:{...cDef.scales.y.ticks,callback:v=>v+'%'}}}}});
 }
+
+// ── AI ASSISTANT ────────────────────────────────────────
+function toggleAI() {
+  aiOpen = !aiOpen;
+  const panel = document.getElementById('aiChatPanel');
+  const btn = document.getElementById('aiToggleBtn');
+  if(panel) panel.style.display = aiOpen ? 'flex' : 'none';
+  if(aiOpen) { setTimeout(()=>document.getElementById('aiInput')?.focus(), 100); }
+}
+
+function askAI(msg) {
+  document.getElementById('aiInput').value = msg;
+  sendAI();
+}
+
+async function sendAI() {
+  const input = document.getElementById('aiInput');
+  const msg = input?.value.trim();
+  if(!msg) return;
+  input.value = '';
+
+  const msgs = document.getElementById('aiMsgs');
+  if(!msgs) return;
+
+  // Remove quick reply buttons on first message
+  const btns = msgs.querySelector('div[style*="flex-wrap:wrap"]');
+  if(btns) btns.remove();
+
+  // Add user bubble
+  msgs.innerHTML += `<div style="display:flex;justify-content:flex-end;gap:8px;align-items:flex-end">
+    <div style="max-width:80%;background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);border-radius:12px 4px 12px 12px;padding:10px 14px;font-size:13px;color:var(--text-primary);line-height:1.5">${msg}</div>
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">U</div>
+  </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Loading bubble
+  const loadId = 'ai-load-' + Date.now();
+  msgs.innerHTML += `<div id="${loadId}" style="display:flex;gap:8px;align-items:flex-end">
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-dim);border:1px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--primary);flex-shrink:0">AI</div>
+    <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:var(--text-muted)">
+      <span style="display:inline-flex;gap:3px;align-items:center">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 1s infinite;animation-delay:0s"></span>
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 1s infinite;animation-delay:.2s"></span>
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 1s infinite;animation-delay:.4s"></span>
+      </span>
+    </div>
+  </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Build context from demo data
+  const pending = DEMO_JOBS.filter(j=>j.status==='Pending').length;
+  const assigned = DEMO_JOBS.filter(j=>j.status==='Assigned').length;
+  const enRoute = DEMO_JOBS.filter(j=>j.status==='En Route').length;
+  const onSite = DEMO_JOBS.filter(j=>j.status==='On Site').length;
+  const inProg = DEMO_JOBS.filter(j=>j.status==='In Progress').length;
+  const completed = DEMO_JOBS.filter(j=>j.status==='Completed').length;
+  const onDuty = DEMO_TECHS.filter(t=>t.on_duty).map(t=>t.name).join(', ');
+  const offDuty = DEMO_TECHS.filter(t=>!t.on_duty).map(t=>t.name).join(', ');
+  const totalRev = DEMO_JOBS.map(j=>parseFloat(String(j.revenue||'0').replace(/[^0-9.]/g,''))||0).reduce((a,b)=>a+b,0);
+
+  const systemCtx = `You are the Dispatch AI assistant for Lone Star Diesel Repair, a diesel truck repair company using the Diesel Growth dispatch platform.
+
+LIVE DATA RIGHT NOW:
+- Total jobs this month: ${DEMO_JOBS.length}
+- Pending: ${pending} | Assigned: ${assigned} | En Route: ${enRoute} | On Site: ${onSite} | In Progress: ${inProg} | Completed: ${completed}
+- Revenue tracked: $${totalRev.toLocaleString()}
+- Close rate: 81.8%
+- Avg response time: 3.8 min
+- Techs on duty: ${onDuty}
+- Techs off duty: ${offDuty||'None'}
+- Top tech: Carlos M. with 89 jobs at 97% accept rate
+- Most common issue: DEF System faults (31% of calls)
+- Revenue goal: $60,000 — currently at 104% ($62,840)
+
+Be helpful, specific, and concise. You are a dispatch operations expert. Keep answers under 4 sentences unless more detail is requested. Use the live data above to answer questions accurately.`;
+
+  aiHistory.push({role:'user', content: msg});
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemCtx,
+        messages: aiHistory.slice(-10)
+      })
+    });
+    const data = await resp.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I could not get a response right now.';
+    aiHistory.push({role:'assistant', content: reply});
+
+    const loadEl = document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML = `<div style="display:flex;gap:8px;align-items:flex-start">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-dim);border:1px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--primary);flex-shrink:0">AI</div>
+      <div style="max-width:85%;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:var(--text-secondary);line-height:1.55">${reply}</div>
+    </div>`;
+  } catch(e) {
+    const loadEl = document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML = `<div style="display:flex;gap:8px">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-dim);border:1px solid var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--primary);flex-shrink:0">AI</div>
+      <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:var(--red)">Connection error. Make sure you are on Vercel — the AI requires a live connection.</div>
+    </div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// Show AI button after login
+const _origInit = initDashboard;
+initDashboard = function() {
+  _origInit();
+  const btn = document.getElementById('aiToggleBtn');
+  if(btn) btn.style.display = 'flex';
+};
+
+// Hide AI on logout
+const _origLogout = doLogout;
+doLogout = function() {
+  _origLogout();
+  aiOpen = false;
+  aiHistory = [];
+  const panel = document.getElementById('aiChatPanel');
+  const btn = document.getElementById('aiToggleBtn');
+  if(panel) panel.style.display = 'none';
+  if(btn) btn.style.display = 'none';
+  if(document.getElementById('aiMsgs')) document.getElementById('aiMsgs').innerHTML = '';
+};
+
 </script>
+<!-- AI ASSISTANT WIDGET -->
+<div id="aiChatPanel" style="display:none;position:fixed;bottom:24px;right:24px;width:370px;max-height:540px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:16px;z-index:500;flex-direction:column;box-shadow:0 8px 48px rgba(0,0,0,0.6);animation:slideUp .3s ease">
+  <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#EA580C,var(--primary));border-radius:16px 16px 0 0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">🤖</div>
+      <div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:#fff;letter-spacing:.5px">Dispatch AI</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7)">Ask anything about your operation</div>
+      </div>
+    </div>
+    <button onclick="toggleAI()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
+  </div>
+  <div id="aiMsgs" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:360px;min-height:180px">
+    <div style="background:var(--bg-elevated);border-radius:4px 12px 12px 12px;padding:10px 14px;font-size:13px;color:var(--text-secondary);line-height:1.55;border:1px solid var(--border)">Hey! I am your Dispatch AI. I can see your live job data, tech roster, and performance stats. Ask me anything about your operation.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+      <button onclick="askAI('How many jobs are pending right now?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);padding:5px 10px;border-radius:20px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600">Pending jobs?</button>
+      <button onclick="askAI('Who is my top performing tech this month?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);padding:5px 10px;border-radius:20px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600">Top tech?</button>
+      <button onclick="askAI('What is my close rate this month?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);padding:5px 10px;border-radius:20px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600">Close rate?</button>
+      <button onclick="askAI('What is my most common job type?')" style="background:var(--primary-dim);border:1px solid rgba(249,115,22,0.3);color:var(--primary);padding:5px 10px;border-radius:20px;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600">Top issue type?</button>
+    </div>
+  </div>
+  <div style="padding:10px;border-top:1px solid var(--border);display:flex;gap:8px">
+    <input id="aiInput" placeholder="Ask me anything..." style="flex:1;background:var(--bg-base);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')sendAI()">
+    <button onclick="sendAI()" style="background:var(--primary);border:none;color:#fff;border-radius:8px;padding:9px 16px;cursor:pointer;font-family:var(--font-body);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;white-space:nowrap">Send</button>
+  </div>
+</div>
+
+<!-- AI TOGGLE BUTTON -->
+<button id="aiToggleBtn" onclick="toggleAI()" style="display:none;position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#EA580C,var(--primary));border:none;color:#fff;border-radius:14px;padding:12px 20px;cursor:pointer;font-family:var(--font-display);font-size:14px;font-weight:600;letter-spacing:.5px;box-shadow:0 4px 24px var(--primary-glow);z-index:499;display:flex;align-items:center;gap:8px;transition:transform .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+  🤖 <span>AI Assistant</span>
+</button>
+
 </body>
 </html>
