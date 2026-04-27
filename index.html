@@ -3,212 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diesel Dispatch Network — Client Portal</title>
+<title>Diesel Growth Portal</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #0a0a0a;
-  color: #fff;
-}
-
-header {
-  padding: 20px;
-  border-bottom: 1px solid #222;
+  color: white;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-}
-
-.status {
-  font-size: 12px;
-  color: #22c55e;
-  font-weight: bold;
+  height: 100vh;
 }
 
 .container {
-  padding: 20px;
-}
-
-.card {
-  background: #111;
-  border: 1px solid #222;
-  padding: 16px;
-  margin-bottom: 14px;
-  border-radius: 10px;
-}
-
-.title {
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.label {
-  color: #888;
-  font-size: 13px;
-}
-
-.login {
-  max-width: 320px;
-  margin: 120px auto;
   text-align: center;
 }
 
 input {
-  width: 100%;
+  display: block;
+  margin: 10px auto;
   padding: 10px;
-  margin-bottom: 10px;
+  width: 220px;
   background: #111;
   border: 1px solid #333;
-  color: #fff;
+  color: white;
 }
 
 button {
-  width: 100%;
-  padding: 10px;
+  padding: 10px 20px;
   background: #d97706;
   border: none;
-  color: #000;
+  color: black;
   font-weight: bold;
   cursor: pointer;
+  width: 240px;
 }
 
-table {
+button:hover {
+  opacity: 0.9;
+}
+
+.hidden {
+  display: none;
+}
+
+.dashboard {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #222;
-  text-align: left;
-}
-
-th {
-  color: #aaa;
+.footer {
+  position: absolute;
+  bottom: 10px;
+  left: 20px;
   font-size: 12px;
+  color: #888;
 }
 
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #111;
+  padding: 20px;
+  margin-bottom: 15px;
+  border: 1px solid #222;
+}
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="loginScreen" class="login">
+<div id="login" class="container">
   <h2>Secure Portal Access</h2>
-  <input id="user" placeholder="Username">
-  <input id="pass" type="password" placeholder="Password">
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
   <button onclick="login()">Access</button>
+  <p style="font-size:12px;color:#777;">Secure access requires assigned credentials.</p>
 </div>
 
-<!-- APP -->
-<div id="app" style="display:none;">
-
-<header>
-  <div>
-    <div>Diesel Dispatch Network</div>
-    <div class="status">● SYSTEM ACTIVE</div>
-  </div>
-  <div>Client Command Center</div>
-</header>
-
-<div class="container">
-
-  <div class="card">
-    <div class="title">Live Operations</div>
-    <div class="label">Real-time dispatch activity</div>
+<!-- OWNER DASH -->
+<div id="ownerDash" class="dashboard hidden">
+  <div class="topbar">
+    <h2>Owner Dashboard</h2>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <div class="card">
-    <div class="title">Active Jobs</div>
+  <div class="card">Total Jobs: 12</div>
+  <div class="card">Active Jobs: 4</div>
+  <div class="card">Revenue: $8,420</div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Job ID</th>
-          <th>Company</th>
-          <th>Issue</th>
-          <th>Tech</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="jobsTable"></tbody>
-    </table>
-
+  <div class="footer">
+    <span>DIESEL GROWTH · CONFIDENTIAL CLIENT PORTAL</span><br>
+    <span>Live sync</span>
   </div>
-
 </div>
 
+<!-- TECH DASH -->
+<div id="techDash" class="dashboard hidden">
+  <div class="topbar">
+    <h2>Technician Dashboard</h2>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="card">
+    Job #1476<br>
+    Location: Dallas, TX<br>
+    Issue: DEF Sensor Failure
+  </div>
+
+  <div class="footer">
+    <span>DIESEL GROWTH · CONFIDENTIAL CLIENT PORTAL</span>
+  </div>
 </div>
 
 <script>
-
-// SIMPLE AUTH (replace later with real backend)
-const USERS = {
-  "owner": "admin123",
-  "dispatch": "dispatch123"
-};
-
 function login() {
-  const u = document.getElementById("user").value;
-  const p = document.getElementById("pass").value;
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
 
-  if (USERS[u] && USERS[u] === p) {
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").style.display = "block";
-  } else {
+  // Simple role logic (replace later with real auth)
+  if (user === "owner" && pass === "123") {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("ownerDash").classList.remove("hidden");
+  } 
+  else if (user === "tech" && pass === "123") {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("techDash").classList.remove("hidden");
+  } 
+  else {
     alert("Invalid credentials");
   }
 }
 
-// SAMPLE JOB DATA (replace with API later)
-const JOBS = [
-  {
-    id: "JOB-9012",
-    company: "Atlas Freight",
-    issue: "Engine derate",
-    tech: "Miguel",
-    status: "Assigned"
-  },
-  {
-    id: "JOB-9011",
-    company: "Westline Logistics",
-    issue: "Brake air leak",
-    tech: "Samir",
-    status: "In Progress"
-  },
-  {
-    id: "JOB-9010",
-    company: "Prime Haul",
-    issue: "Overheating",
-    tech: "Derek",
-    status: "Completed"
-  }
-];
-
-// RENDER JOBS
-function loadJobs() {
-  const table = document.getElementById("jobsTable");
-  table.innerHTML = "";
-
-  JOBS.forEach(j => {
-    table.innerHTML += `
-      <tr>
-        <td>${j.id}</td>
-        <td>${j.company}</td>
-        <td>${j.issue}</td>
-        <td>${j.tech}</td>
-        <td>${j.status}</td>
-      </tr>
-    `;
-  });
+function logout() {
+  document.getElementById("login").classList.remove("hidden");
+  document.getElementById("ownerDash").classList.add("hidden");
+  document.getElementById("techDash").classList.add("hidden");
 }
-
-loadJobs();
-
 </script>
 
 </body>
